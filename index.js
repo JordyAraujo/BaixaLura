@@ -19,7 +19,7 @@ main();
 async function main() {
     criaPasta(formacaoNome);
     let [email, senha] = conta.split(':');
-    // logger.log('login', { email, senha });
+    logger.log('login', { email, senha });
     const accessToken = await login(email, senha);
 
     if (!accessToken) {
@@ -27,7 +27,7 @@ async function main() {
         return;
     }
 
-    // logger.log('logado-sucesso', { email, senha });
+    logger.log('logado-sucesso', { email, senha });
 
     let cursosURL = await arrayURLCursos(accessToken);
     let cursos = [];
@@ -39,21 +39,19 @@ async function main() {
     cursosURL.forEach(async (cursoURL, indice) => {
         let indiceStr = (indice + 1).toString();
         cursos[indice] = await infoCurso(accessToken, cursoURL);
-        // logger.log('id-curso', { id: cursos[indice].id, apelido: cursos[indice].slug, nome: cursos[indice].name, tempoVideo: cursos[indice].totalVideoTime });
+        logger.log('id-curso', { id: cursos[indice].id, apelido: cursos[indice].slug, nome: cursos[indice].name, tempoVideo: cursos[indice].totalVideoTime });
         let nomeCurso = cursos[indice].name.replace(':', ' -');
         criaPasta(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}`);
-
-        for (const titulo of cursos[indice].sections) {
-            // logger.log('titulo-download', { titulo: titulo.titulo });
+        for await (let titulo of cursos[indice].sections) {
+            logger.log('titulo-download', { titulo: titulo.titulo });
             criaPasta(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}/${titulo.position.toString().padStart(2, '0')} - ${titulo.titulo}`);
-
-            for (const [index, aula] of titulo.videos.entries()) {
+            for await (let [index, aula] of titulo.videos.entries()) {
                 let nomeAula = aula.nome.replace(':', ' -');
                 let url = await retornaLinkVideo(aula.id, cursos[indice].slug, accessToken);
-                // logger.log('download-aula', { aula: aula.nome, id: aula.id });
-                downloadVideo(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}/${titulo.position.toString().padStart(2, '0')} - ${titulo.titulo}/${(index + 1).toString().padStart(2, '0')} - ${nomeAula}.mp4`, url, nomeAula);
+                logger.log('download-aula', { aula: aula.nome, id: aula.id });
+                await downloadVideo(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}/${titulo.position.toString().padStart(2, '0')} - ${titulo.titulo}/${(index + 1).toString().padStart(2, '0')} - ${nomeAula}.mp4`, url, nomeAula);
+                logger.log('titulo-baixado', { formacao: formacaoNome, curso: nomeCurso, aula: nomeAula });
             }
-
         }
     });
 }
@@ -167,7 +165,7 @@ async function retornaLinkVideo(id, apelido, accessToken) {
         }
     });
 
-    let video = JSON.parse(res.body)[1]; // Selecione o índice 1 se quiser diminuir a qualidade do vídeo
+    let video = JSON.parse(res.body)[0]; // Selecione o índice 1 se quiser diminuir a qualidade do vídeo
     return video.link;
 }
 
@@ -177,10 +175,14 @@ async function retornaLinkVideo(id, apelido, accessToken) {
  * @param {String} url 
  * @param {String} titulo 
  */
-function downloadVideo(arquivo, url, titulo) {
-    const stream = m3u8stream(url);
-    stream.pipe(fs.createWriteStream(arquivo));
-    stream.on('progress', (segment, totalSegments, downloaded) => {
-        logger.log('baixando-video', { titulo: titulo, segmentoAtual: segment.num, totalDeSegmentos: totalSegments, baixado: downloaded });
+async function downloadVideo(arquivo, url, titulo) {
+    return new Promise((resolve, reject) => {
+        const stream = m3u8stream(url);
+        stream.pipe(fs.createWriteStream(arquivo));
+        stream.on('progress', (segment, totalSegments, downloaded) => {
+            logger.log('baixando-video', { titulo: titulo, segmentoAtual: segment.num, totalDeSegmentos: totalSegments, baixado: downloaded });
+        });
+        stream.on('finish', resolve);
+        stream.on('error', reject);
     });
 }
