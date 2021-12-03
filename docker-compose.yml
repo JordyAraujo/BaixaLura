@@ -1,0 +1,13 @@
+version: '3'
+services:
+  bot:
+    image: node:16.13.1
+    container_name: baixalura
+    volumes:
+      - ${PWD}:/home/baixalura
+    tty: true
+    environment:
+      TZ: "America/Sao_Paulo"
+    command: >
+      bash -c "cd /home/baixalura &&
+      node index.js"
