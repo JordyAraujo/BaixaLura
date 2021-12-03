@@ -1,0 +1,29 @@
+{
+  "name": "gengar",
+  "version": "1.0.0",
+  "description": "Alura download videos cursos",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "alura",
+    "download",
+    "videos",
+    "alura-download"
+  ],
+  "author": "v4p0r",
+  "license": "ISC",
+  "dependencies": {
+    "ansi-colors": "^4.1.1",
+    "axios": "^0.24.0",
+    "dotenv": "^8.2.0",
+    "m3u8stream": "^0.8.4",
+    "readline": "^1.3.0",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.3.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}
