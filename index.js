@@ -29,31 +29,7 @@ async function main() {
 
     logger.log('logado-sucesso', { email, senha });
 
-    let cursosURL = await arrayURLCursos(accessToken);
-    let cursos = [];
-
-    // Esse conjunto de laços pega as URLs dos cursos, cria suas pastas
-    // depois entra em cada curso, pegando suas aulas e criando as pastas
-    // depois entrando em cada aula, para pegar as informações dos vídeos
-    // e salva em formato .m3u8 como, vem do servidor da Alura 
-    cursosURL.forEach(async (cursoURL, indice) => {
-        let indiceStr = (indice + 1).toString();
-        cursos[indice] = await infoCurso(accessToken, cursoURL);
-        logger.log('id-curso', { id: cursos[indice].id, apelido: cursos[indice].slug, nome: cursos[indice].name, tempoVideo: cursos[indice].totalVideoTime });
-        let nomeCurso = cursos[indice].name.replace(':', ' -');
-        criaPasta(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}`);
-        for await (let titulo of cursos[indice].sections) {
-            logger.log('titulo-download', { titulo: titulo.titulo });
-            criaPasta(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}/${titulo.position.toString().padStart(2, '0')} - ${titulo.titulo}`);
-            for await (let [index, aula] of titulo.videos.entries()) {
-                let nomeAula = aula.nome.replace(':', ' -');
-                let url = await retornaLinkVideo(aula.id, cursos[indice].slug, accessToken);
-                logger.log('download-aula', { aula: aula.nome, id: aula.id });
-                await downloadVideo(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}/${titulo.position.toString().padStart(2, '0')} - ${titulo.titulo}/${(index + 1).toString().padStart(2, '0')} - ${nomeAula}.mp4`, url, nomeAula);
-                logger.log('titulo-baixado', { formacao: formacaoNome, curso: nomeCurso, aula: nomeAula });
-            }
-        }
-    });
+    await getVideos(accessToken);
 }
 
 /**
@@ -185,4 +161,33 @@ async function downloadVideo(arquivo, url, titulo) {
         stream.on('finish', resolve);
         stream.on('error', reject);
     });
+}
+
+async function getVideos(accessToken){
+    // Esse conjunto de laços pega as URLs dos cursos, cria suas pastas
+    // depois entra em cada curso, pegando suas aulas e criando as pastas
+    // depois entrando em cada aula, para pegar as informações dos vídeos
+    // e salva em formato .m3u8 como, vem do servidor da Alura
+    let cursosURL = await arrayURLCursos(accessToken);
+    let cursos = [];
+    const promises = cursosURL.map(async (cursoURL, indice) => {
+        let indiceStr = (indice + 1).toString();
+        cursos[indice] = await infoCurso(accessToken, cursoURL);
+        logger.log('id-curso', { id: cursos[indice].id, apelido: cursos[indice].slug, nome: cursos[indice].name, tempoVideo: cursos[indice].totalVideoTime });
+        let nomeCurso = cursos[indice].name.replace(':', ' -');
+        criaPasta(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}`);
+        for await (let titulo of cursos[indice].sections) {
+            logger.log('titulo-download', { titulo: titulo.titulo });
+            criaPasta(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}/${titulo.position.toString().padStart(2, '0')} - ${titulo.titulo}`);
+            for await (let [index, aula] of titulo.videos.entries()) {
+                let nomeAula = aula.nome.replace(':', ' -');
+                let url = await retornaLinkVideo(aula.id, cursos[indice].slug, accessToken);
+                logger.log('download-aula', { aula: aula.nome, id: aula.id });
+                await downloadVideo(`${formacaoNome}/${indiceStr.padStart(2, '0')} - ${nomeCurso}/${titulo.position.toString().padStart(2, '0')} - ${titulo.titulo}/${(index + 1).toString().padStart(2, '0')} - ${nomeAula}.mp4`, url, nomeAula);
+                logger.log('titulo-baixado', { formacao: formacaoNome, curso: nomeCurso, aula: nomeAula });
+            }
+        }
+    });
+
+    await Promise.all(promises);
 }
