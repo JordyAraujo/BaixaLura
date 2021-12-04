@@ -1,8 +1,0 @@
-# Credenciais
-CONTA="email@email.com:senha"
-
-# URL da formação
-FORMACAO_URL="https://cursos.alura.com.br/formacao-nome-da-formacao"
-
-# Nome da formação
-FORMACAO_NOME="Nome da Formação"

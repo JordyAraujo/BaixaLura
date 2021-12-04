@@ -7,7 +7,8 @@ const request = require('request');
 
 require('dotenv').config();
 
-const conta = process.env.CONTA;
+const email = process.env.EMAIL;
+const senha = process.env.SENHA;
 const formacaoURL = process.env.FORMACAO_URL;
 const formacaoNome = process.env.FORMACAO_NOME;
 
@@ -18,7 +19,6 @@ main();
  */
 async function main() {
     criaPasta(formacaoNome);
-    let [email, senha] = conta.split(':');
     logger.log('login', { email, senha });
     const accessToken = await login(email, senha);
 

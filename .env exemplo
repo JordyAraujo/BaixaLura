@@ -1,0 +1,9 @@
+# Credenciais
+EMAIL="email@conta.alura.com"
+SENHA="senhaAlura_123"
+
+# URL da formação
+FORMACAO_URL="https://cursos.alura.com.br/formacao-url-da-formacao"
+
+# Nome da formação
+FORMACAO_NOME="Nome da Formação"

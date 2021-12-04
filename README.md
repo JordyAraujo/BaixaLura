@@ -17,14 +17,15 @@ git clone https://github.com/JordyAraujo/BaixaLura.git
 cd BaixaLura
 ```
 
-Depois, vá até o arquivo *.env example*, o renomeie para *.env* e preencha os dados solicitados:
+Depois, vá até o arquivo *.env exemplo*, o renomeie para *.env* e preencha os dados solicitados:
 
 ```bash
 # Credenciais
-CONTA="email@email.com:senha"
+EMAIL="email@conta.alura.com"
+SENHA="senhaAlura_123"
 
 # URL da formação
-FORMACAO_URL="https://cursos.alura.com.br/formacao-nome-da-formacao"
+FORMACAO_URL="https://cursos.alura.com.br/formacao-url-da-formacao"
 
 # Nome da formação
 FORMACAO_NOME="Nome da Formação"

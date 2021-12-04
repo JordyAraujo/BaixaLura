@@ -1,5 +1,4 @@
 'use strict';
-const readline = require('readline');
 
 const ansi = require('ansi-colors');
 /**
@@ -21,7 +20,7 @@ function log(type, infos) {
         'baixando-video': ansi.yellow(`[INFO] BAIXANDO VÍDEO: ${ansi.yellowBright(`${infos.titulo}`.toUpperCase())} | ${infos.segmentoAtual} de ${infos.totalDeSegmentos} segmentos (${(infos.segmentoAtual / infos.totalDeSegmentos * 100).toFixed(2)}%) ${(infos.baixado / 1024 / 1024).toFixed(2)}MB baixados`)
     };
 
-    console.log(lines[type])
+    console.log(lines[type]);
 
     return;
 
