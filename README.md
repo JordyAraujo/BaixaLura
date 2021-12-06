@@ -17,7 +17,7 @@ git clone https://github.com/JordyAraujo/BaixaLura.git
 cd BaixaLura
 ```
 
-Depois, vá até o arquivo *.env exemplo*, o renomeie para *.env* e preencha os dados solicitados:
+Depois, vá até o arquivo *.env.exemplo*, o renomeie para *.env* e preencha os dados solicitados:
 
 ```bash
 # Credenciais
